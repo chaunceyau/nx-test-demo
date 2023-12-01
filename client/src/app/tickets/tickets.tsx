@@ -11,7 +11,7 @@ export function TicketsPage() {
   >();
 
   const query = useQuery<Ticket[]>({
-    queryKey: ['allTickets', statusFilter],
+    queryKey: ['tickets', statusFilter],
     queryFn: () => {
       // could encode if more ambiguous data
       const searchParams = statusFilter ? '?status=' + statusFilter : '';

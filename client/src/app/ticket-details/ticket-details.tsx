@@ -8,7 +8,7 @@ import TicketAssignee from './assignee/assignee';
 export function TicketDetails() {
   const params = useParams<{ id: string }>();
   const query = useQuery<Ticket>({
-    queryKey: ['todo', params.id],
+    queryKey: ['tickets', params.id],
     queryFn: () => fetch('/api/tickets/' + params.id).then((r) => r.json()),
   });
 
@@ -20,8 +20,8 @@ export function TicketDetails() {
       }),
     onSuccess: () => {
       // could optimistically update if wanted
-      queryClient.invalidateQueries({ queryKey: ['todos'] });
-      queryClient.invalidateQueries({ queryKey: ['todos', params.id] });
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', params.id] });
     },
     onError: () => alert('Failed to create ticket, please try again.'),
   });

@@ -5,7 +5,7 @@ import { queryClient } from '../../app';
 
 export function TicketAssignee({ assigneeId }: { assigneeId?: number | null }) {
   const query = useQuery<User[]>({
-    queryKey: ['allUsers'],
+    queryKey: ['users'],
     queryFn: () => fetch('/api/users').then((r) => r.json()),
   });
 
@@ -23,7 +23,7 @@ export function TicketAssignee({ assigneeId }: { assigneeId?: number | null }) {
     },
     onSuccess: () => {
       // could optimistically update if wanted
-      queryClient.invalidateQueries({ queryKey: ['todos', params.id] });
+      queryClient.invalidateQueries({ queryKey: ['tickets', params.id] });
     },
     onError: () => alert('Failed to assign ticket, please try again.'),
   });
