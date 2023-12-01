@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Ticket } from '@acme/shared-models';
+import { Ticket, TicketStatusFilter } from '@acme/shared-models';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -26,8 +26,17 @@ export class TicketsService {
 
   constructor(private usersService: UsersService) {}
 
-  async tickets(): Promise<Ticket[]> {
-    return this.storedTickets;
+  async tickets(filters?: { status: TicketStatusFilter }): Promise<Ticket[]> {
+    if (!filters) return this.storedTickets;
+    return this.storedTickets.filter((ticket) => {
+      if (filters.status === 'complete') {
+        return ticket.completed;
+      } else if (filters.status === 'incomplete') {
+        return !ticket.completed;
+      } else {
+        return true;
+      }
+    });
   }
 
   async ticket(id: number): Promise<Ticket | null> {

@@ -9,18 +9,20 @@ import {
   Delete,
   Body,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { randomDelay } from '../utils/random-delay';
 import { TicketsService } from './tickets.service';
+import { TicketStatusFilter } from '@acme/shared-models';
 
 @Controller('tickets')
 export class TicketsController {
   constructor(private ticketsService: TicketsService) {}
 
   @Get()
-  async getTickets() {
+  async getTickets(@Query() query?: { status: TicketStatusFilter }) {
     await randomDelay();
-    return this.ticketsService.tickets();
+    return this.ticketsService.tickets(query);
   }
 
   @Get(':id')
