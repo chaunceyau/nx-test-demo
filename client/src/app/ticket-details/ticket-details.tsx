@@ -12,7 +12,7 @@ export function TicketDetails() {
     queryFn: () => fetch('/api/tickets/' + params.id).then((r) => r.json()),
   });
 
-  const { mutate } = useMutation({
+  const { mutate ,isPending} = useMutation({
     mutationFn: () =>
       // would likely want to paginate this somehow
       fetch('/api/tickets/' + params.id + '/complete', {
@@ -31,7 +31,7 @@ export function TicketDetails() {
       <div className="flex justify-between">
         <h1 className="text-xl font-bold mb-2">Ticket ID: {params.id}</h1>
         {query.data && (
-          <Button onClick={() => mutate()}>
+          <Button onClick={() => mutate()} disabled={isPending}>
             Mark {query.data?.completed ? 'Incomplete' : 'Complete'}
           </Button>
         )}
