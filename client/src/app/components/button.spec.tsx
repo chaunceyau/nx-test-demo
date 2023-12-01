@@ -14,4 +14,14 @@ describe('Button', () => {
     fireEvent.click(screen.getByRole('button', { name: /submit/i }));
     expect(mockOnClickHandler).toHaveBeenCalledOnce();
   });
+  it('should not call on click handler when disabled', () => {
+    const mockOnClickHandler = vi.fn();
+    render(
+      <Button disabled onClick={mockOnClickHandler}>
+        Submit
+      </Button>
+    );
+    fireEvent.click(screen.getByRole('button', { name: /submit/i }));
+    expect(mockOnClickHandler).not.toHaveBeenCalled();
+  });
 });
