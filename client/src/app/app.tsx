@@ -11,7 +11,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="px-6 py-5 flex flex-col gap-y-4">
-        <h1 className="text-2xl font-bold">Ticketing App</h1>
+        <h1 className="text-2xl font-bold">Ticketing App 👋</h1>
         <Routes>
           <Route path="/" element={<TicketsPage />} />
           <Route path="/create" element={<CreateTicketPage />} />
