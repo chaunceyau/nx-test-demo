@@ -75,5 +75,6 @@
       "!{projectRoot}/src/test-setup.[jt]s"
     ]
   },
-  "cacheDirectory": ".nxcache"
+  "cacheDirectory": ".nxcache",
+  "nxCloudAccessToken": "MzliMTg0NjItNjQzNC00NTc2LWI1YzYtYmVlODU5ZjA3ZWQzfHJlYWQtd3JpdGU="
 }
