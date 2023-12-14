@@ -1,5 +1,4 @@
 import {
-  NotFoundException,
   UnprocessableEntityException,
   Controller,
   Get,
@@ -14,15 +13,35 @@ import {
 import { randomDelay } from '../utils/random-delay';
 import { TicketsService } from './tickets.service';
 import { TicketStatusFilter } from '@acme/shared-models';
+import { UsersService } from '../users/users.service';
 
 @Controller('tickets')
 export class TicketsController {
-  constructor(private ticketsService: TicketsService) {}
+  constructor(
+    private ticketsService: TicketsService,
+    private userService: UsersService
+  ) {}
 
   @Get()
-  async getTickets(@Query() query?: { status: TicketStatusFilter }) {
+  async getTickets(
+    @Query() query?: { status: TicketStatusFilter; term: string }
+  ) {
     await randomDelay();
     return this.ticketsService.tickets(query);
+  }
+
+  @Get('details/:id')
+  async getTicketDetailsPageInfo(@Param('id') id: string) {
+    await randomDelay();
+    const ticket = await this.ticketsService.ticket(Number(id));
+    const users = await this.userService.users();
+    if (ticket)
+      return {
+        ticket,
+        possibleAssignees: users,
+        assignee: users.find((u) => (u.id = ticket.assigneeId)),
+      };
+    throw new Error('this ticket does not exist');
   }
 
   @Get(':id')
@@ -30,7 +49,7 @@ export class TicketsController {
     await randomDelay();
     const ticket = await this.ticketsService.ticket(Number(id));
     if (ticket) return ticket;
-    throw new NotFoundException();
+    throw new Error('this ticket does not exist');
   }
 
   @Post()

@@ -1,13 +1,19 @@
 import { User } from '@acme/shared-models';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { queryClient } from '../../app';
 
-export function TicketAssignee({ assigneeId }: { assigneeId?: number | null }) {
-  const query = useQuery<User[]>({
-    queryKey: ['users'],
-    queryFn: () => fetch('/api/users').then((r) => r.json()),
-  });
+export function TicketAssignee({
+  assignee,
+  possibleAssignees,
+}: {
+  assignee: User;
+  possibleAssignees: User[];
+}) {
+  // const query = useQuery<User[]>({
+  //   queryKey: ['users'],
+  //   queryFn: () => fetch('/api/users').then((r) => r.json()),
+  // });
 
   const params = useParams();
 
@@ -31,7 +37,7 @@ export function TicketAssignee({ assigneeId }: { assigneeId?: number | null }) {
   return (
     <label className="block mb-4">
       <p className="font-bold text-lg">Select assignee:</p>
-      {query.data && assigneeId !== undefined && (
+      {assignee && (
         <select
           name="assignee"
           onChange={(e) =>
@@ -41,8 +47,8 @@ export function TicketAssignee({ assigneeId }: { assigneeId?: number | null }) {
           }
         >
           <option value={-1}>Unassigned</option>
-          {query.data.map((user) => (
-            <option value={user.id} selected={assigneeId === user.id}>
+          {possibleAssignees.map((user) => (
+            <option value={user.id} selected={assignee.id === user.id}>
               {user.name}
             </option>
           ))}
@@ -53,10 +59,3 @@ export function TicketAssignee({ assigneeId }: { assigneeId?: number | null }) {
 }
 
 export default TicketAssignee;
-
-// const getNameLabel = () => {
-//     if (userQuery.data === null) {
-//       return 'No assignee';
-//     }
-//     return userQuery.data?.name;
-//   };

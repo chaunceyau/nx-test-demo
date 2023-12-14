@@ -26,9 +26,12 @@ export class TicketsService {
 
   constructor(private usersService: UsersService) {}
 
-  async tickets(filters?: { status: TicketStatusFilter }): Promise<Ticket[]> {
+  async tickets(filters?: {
+    status: TicketStatusFilter;
+    term: string;
+  }): Promise<Ticket[]> {
     if (!filters) return this.storedTickets;
-    return this.storedTickets.filter((ticket) => {
+    const filteredByStatus = this.storedTickets.filter((ticket) => {
       if (filters.status === 'complete') {
         return ticket.completed;
       } else if (filters.status === 'incomplete') {
@@ -36,6 +39,16 @@ export class TicketsService {
       } else {
         return true;
       }
+    });
+
+    if (!filters.term) {
+      return filteredByStatus;
+    }
+
+    return filteredByStatus.filter((ticket) => {
+      return ticket.description
+        .toLowerCase()
+        .includes(filters.term.toLowerCase());
     });
   }
 

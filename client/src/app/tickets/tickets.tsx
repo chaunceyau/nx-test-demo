@@ -9,13 +9,25 @@ export function TicketsPage() {
   const [statusFilter, setStatusFilter] = useState<
     TicketStatusFilter | undefined
   >();
+  const [searchValue, setSearchValue] = useState<string>('');
 
   const query = useQuery<Ticket[]>({
-    queryKey: ['tickets', statusFilter],
+    queryKey: ['tickets', statusFilter, searchValue],
     queryFn: () => {
-      // could encode if more ambiguous data
-      const searchParams = statusFilter ? '?status=' + statusFilter : '';
-      return fetch('/api/tickets' + searchParams, {}).then((r) => r.json());
+      const params = new URLSearchParams();
+      if (statusFilter) {
+        params.append('status', statusFilter);
+      }
+      if (searchValue) {
+        params.append('term', searchValue);
+      }
+
+      let endpoint = '/api/tickets';
+      if (params) {
+        endpoint += '?' + params;
+      }
+
+      return fetch(endpoint, {}).then((r) => r.json());
     },
   });
 
@@ -29,6 +41,13 @@ export function TicketsPage() {
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
       />
+      <div>
+        <input
+          className="border rounded"
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+        />
+      </div>
       {query.data?.length === 0 && <p>No tickets match your filters...</p>}
       {query.isLoading && <p>fetching tickets...</p>}
       {query.data && (

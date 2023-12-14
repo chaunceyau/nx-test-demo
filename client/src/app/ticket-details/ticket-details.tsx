@@ -1,22 +1,33 @@
-import { Ticket } from '@acme/shared-models';
+import { Ticket, User } from '@acme/shared-models';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../components/button';
 import { queryClient } from '../app';
 import TicketAssignee from './assignee/assignee';
 
 export function TicketDetails() {
   const params = useParams<{ id: string }>();
-  const query = useQuery<Ticket>({
-    queryKey: ['tickets', params.id],
-    queryFn: () => fetch('/api/tickets/' + params.id).then((r) => r.json()),
+  const navigate = useNavigate();
+  const query = useQuery<{
+    ticket: Ticket;
+    assignee: User;
+    possibleAssignees: User[];
+  }>({
+    queryKey: ['tickets/details', params.id],
+    queryFn: async () => {
+      const response = await fetch('/api/tickets/details/' + params.id);
+      if (response.status !== 200) {
+        alert('Failed to find ticket, please try using a valid id.');
+      }
+      return response.json();
+    },
   });
 
-  const { mutate ,isPending} = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: () =>
       // would likely want to paginate this somehow
       fetch('/api/tickets/' + params.id + '/complete', {
-        method: query.data?.completed ? 'delete' : 'put',
+        method: query.data?.ticket.completed ? 'delete' : 'put',
       }),
     onSuccess: () => {
       // could optimistically update if wanted
@@ -28,23 +39,33 @@ export function TicketDetails() {
 
   return (
     <div className="border rounded px-4 py-3">
-      <div className="flex justify-between">
+      <Button onClick={() => navigate('/')}>Back to Ticket List</Button>
+      <div className="flex justify-between mt-4">
         <h1 className="text-xl font-bold mb-2">Ticket ID: {params.id}</h1>
         {query.data && (
           <Button onClick={() => mutate()} disabled={isPending}>
-            Mark {query.data?.completed ? 'Incomplete' : 'Complete'}
+            Mark {query.data?.ticket.completed ? 'Incomplete' : 'Complete'}
           </Button>
         )}
       </div>
       <h2 className="text-lg font-bold">Description</h2>
-      <p>{query.data?.description}</p>
+      <p>{query.data?.ticket.description}</p>
       <h2 className="text-lg font-bold">Status</h2>
       {query.data && (
-        <p className={query.data.completed ? 'text-green-600' : 'text-red-600'}>
-          {query.data?.completed ? 'Complete' : 'Incomplete'}
+        <p
+          className={
+            query.data.ticket.completed ? 'text-green-600' : 'text-red-600'
+          }
+        >
+          {query.data?.ticket.completed ? 'Complete' : 'Incomplete'}
         </p>
       )}
-      <TicketAssignee assigneeId={query.data?.assigneeId} />
+      {query.data && (
+        <TicketAssignee
+          assignee={query.data?.assignee}
+          possibleAssignees={query.data?.possibleAssignees}
+        />
+      )}
     </div>
   );
 }
